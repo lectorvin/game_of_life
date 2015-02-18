@@ -1,5 +1,6 @@
 import numpy as np
 import time
+from PIL import Image, ImageDraw
 
 
 while 1:
@@ -12,6 +13,8 @@ while 1:
         break
 size = array1.shape
 generation = 1
+HEIGHT = 320   # size of image
+WIDTH = 320
 
 
 class UnexpectedError(Exception):
@@ -53,30 +56,34 @@ def neighbours(i, j):
     return np.count_nonzero(_array)
 
 
-def show(g):
+def show_(g):
     print(g,"generation")
-    HEIGHT = 320
-    WIDTH = 400
     im = Image.new("RGBA", (WIDTH+1,HEIGHT+1), (256,256,256,256))
     draw = ImageDraw.Draw(im)
     step1 = HEIGHT / size[0]
     step2 = WIDTH / size[1]
     for k in range(size[0]+1):
-        draw.line((0,k*step1, WIDTH,k*step1), fill=0)    # ------
+        draw.line((0,k*step1, WIDTH,k*step1), fill="black")    # ------
     for k in range(size[1]+1):
-        draw.line((k*step2,0, k*step2, HEIGHT), fill=0)    # |
+        draw.line((k*step2,0, k*step2, HEIGHT), fill="black")    # |
     for st in range(size[0]):
         for col in range(size[1]):
             if array1[st][col]:
                 draw.rectangle((col*step2,st*step1,(col+1)*step2,(st+1)*step1),
-                               fill=0,
-                               outline=0)
-    im.show()
-
+                               fill="black",
+                               outline="black")
+    return im
+                
 
 if __name__ == "__main__":
-    while array1.any():   # while anybody lives
-        show(generation)
+    f = input("Choose mode (1 - showing, 2 - generate x generation)  ")
+    if f == "2":
+        n = float(input("x  "))
+    else:
+        n = float("inf")
+    while array1.any() and generation < n:   # while anybody lives
+        if f == "1":
+            show_(generation).show()
         array = np.zeros(size, dtype=int)
 
         for st in range(size[0]):   # strings
@@ -99,6 +106,8 @@ if __name__ == "__main__":
 
         array1 = array
         generation += 1
-        time.sleep(1.5)
-
-    raise(UnexpectedError("Dead after {} generation".format(generation)))
+        # time.sleep(1.5)
+    if f == "2":
+        show_(generation).save("After {} generation.gif".format(generation))
+    elif not(array1.any()):
+        raise(UnexpectedError("Dead after {} generation".format(generation)))
