@@ -1,6 +1,6 @@
 import numpy as np
 import tkinter as tk
-import sys     # sys.exit(0)
+import sys     # sys.exit()
 
 from PIL import Image, ImageDraw, ImageTk
 
@@ -11,7 +11,7 @@ while 1:
         array1 = np.loadtxt(way, dtype=int)
     except IOError:
         if way == "exit":
-            sys.exit(0)
+            sys.exit()
         print("No such file or directory: {}\ntry again".format(way))
     else:
         break
@@ -20,6 +20,7 @@ size = array1.shape
 generation = 1
 HEIGHT = 500   # size of image
 WIDTH = 500
+change = 0  # 1 if was some changes in figure, else 0
 
 
 class UnexpectedError(Exception):
@@ -66,7 +67,8 @@ def neighbours(i, j):
 def image_(g):
     """ generate image of g generation;
     """
-    print(g, "generation")
+    if f=='1':
+        print(g, "generation")
     im = Image.new("RGBA", (WIDTH+1, HEIGHT+1), (256, 256, 256, 256))
     draw = ImageDraw.Draw(im)
     step1 = HEIGHT / size[0]
@@ -98,9 +100,10 @@ def show_():
 def main():
     """ life
     """
-    global array1, generation
+    global array1, generation, change, f
     if not(array1.any()):   # if all cells are dead
-        raise(UnexpectedError("Dead after {} generation".format(generation)))
+        raise(UnexpectedError("Dead after {} generation".format(generation)))  
+    change = 0
     if f == "1":  # if we're watching, how they're living
         show_()   # show current generation
     array = np.zeros(size, dtype=int)
@@ -109,6 +112,7 @@ def main():
             if array1[st][col] == 0:   # if cell is dead
                 if neighbours(st, col) == 3:   # and it has 3 alive neighbours
                     array[st][col] = 1    # it become alive
+                    change = 1
                 else:
                     array[st][col] = 0    # else it's still dead
 
@@ -117,12 +121,20 @@ def main():
                     array[st][col] = 1   # it's still alive
                 else:
                     array[st][col] = 0   # else cell dies
+                    change = 1
 
             else:  # if cell not alive, nor dead
                 er = "Wrong data at {} string, {} column".format(st+1, col+1)
-                raise(UnexpectedError(er))
-
+                root.destroy()
+                sys.exit(er)
+            
     array1 = array
+    if not(change) and f=="1":
+        # so, we lived some generation, and then figure become static
+        er = "Figure become static after {} generation".format(generation)
+        root.destroy()
+        raise(UnexpectedError(er))
+        sys.exit()
     generation += 1
 
 
