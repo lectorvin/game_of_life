@@ -67,7 +67,7 @@ def neighbours(i, j):
 def image_(g):
     """ generate image of g generation;
     """
-    if f=='1':
+    if f == '1':
         print(g, "generation")
     im = Image.new("RGBA", (WIDTH+1, HEIGHT+1), (256, 256, 256, 256))
     draw = ImageDraw.Draw(im)
@@ -102,7 +102,7 @@ def main():
     """
     global array1, generation, change, f
     if not(array1.any()):   # if all cells are dead
-        raise(UnexpectedError("Dead after {} generation".format(generation)))  
+        raise(UnexpectedError("Dead after {} generation".format(generation)))
     change = 0
     if f == "1":  # if we're watching, how they're living
         show_()   # show current generation
@@ -127,9 +127,9 @@ def main():
                 er = "Wrong data at {} string, {} column".format(st+1, col+1)
                 root.destroy()
                 sys.exit(er)
-            
+
     array1 = array
-    if not(change) and f=="1":
+    if not(change) and f == "1":
         # so, we lived some generation, and then figure become static
         er = "Figure become static after {} generation".format(generation)
         root.destroy()
