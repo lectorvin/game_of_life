@@ -86,6 +86,7 @@ def main():
     """ life
     """
     global array1, generation, change, f
+    
     if not(array1.any()):   # if all cells are dead
         raise(UnexpectedError("Dead after {} generation".format(generation)))
     change = 0
@@ -124,7 +125,7 @@ def main():
 
 
 def get_value():
-    global n
+    global n   # number of generation, whick will be generated
     n = int(ent_value.get())
     root2.destroy()
 
@@ -135,6 +136,7 @@ def ok():
     f = var.get()
     root1.destroy()
     if f == "generate x generation":
+        global ent_value, root2
         root2 = tk.Tk()
         root2.geometry('+550+400')
         lb3 = tk.Label(root2, text="x:", font="arial 12")
@@ -144,7 +146,6 @@ def ok():
         lb3.grid(row=1, column=1)
         ent_value.grid(row=1, column=2)
         bt1.grid(row=2, column=1)
-        global ent_value, root2
         root2.mainloop()
 
 
@@ -169,6 +170,7 @@ def get_data():
 
 if __name__ == "__main__":
     way = ""
+    f = ""
     generation = 1
     change = 0  # 1 if was some changes in figure, else 0
     HEIGHT = 500
