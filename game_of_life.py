@@ -86,7 +86,7 @@ def main():
     """ life
     """
     global array1, generation, change, f
-    
+
     if not(array1.any()):   # if all cells are dead
         raise(UnexpectedError("Dead after {} generation".format(generation)))
     change = 0
@@ -159,7 +159,7 @@ def get_data():
     var = tk.StringVar(root1)
     var.set("Mode")
     opt = tk.OptionMenu(root1, var, "show life", "generate x generation")
-    
+
     lb2.grid(row=1, column=1)
     ent_way.grid(row=1, column=2)
     opt.grid(row=2, column=1)
@@ -175,12 +175,12 @@ if __name__ == "__main__":
     change = 0  # 1 if was some changes in figure, else 0
     HEIGHT = 500
     WIDTH = 500
-    
+
     get_data()
     while 1:
         while f == "Mode":
             get_data()
-        
+
         try:
             array1 = np.loadtxt(way, dtype=int)
         except IOError:
@@ -192,7 +192,7 @@ if __name__ == "__main__":
             break
 
     size = array1.shape
-    
+
     if f == "generate x generation":
         # if you want save image as png-image
         # image_(generation).save("After {} generation.png".format(generation))
