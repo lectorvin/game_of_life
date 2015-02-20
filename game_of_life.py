@@ -131,7 +131,9 @@ def get_value():
 
 
 def ok():
-    global way, f
+    global way, f, HEIGHT, WIDTH
+    HEIGHT = int(ent_h.get())
+    WIDTH = int(ent_w.get())
     way = ent_way.get()
     f = var.get()
     root1.destroy()
@@ -150,9 +152,14 @@ def ok():
 
 
 def get_data():
-    global ent_way, var, root1
+    global ent_way, var, root1, ent_h, ent_w
     root1 = tk.Tk()
     root1.geometry('+550+400')
+    lb1 = tk.Label(root1, text="      size of window:", font="arial 12")
+    lbh = tk.Label(root1, text="height", font="arial 12")
+    lbw = tk.Label(root1, text="width", font="arial 12")
+    ent_h = tk.Entry(root1)
+    ent_w = tk.Entry(root1)
     lb2 = tk.Label(root1, text="way to file: ", font="arial 12")
     ent_way = tk.Entry(root1)   # way to file
     bt = tk.Button(root1, text="done", command=ok, font="arial 14")
@@ -160,10 +167,15 @@ def get_data():
     var.set("Mode")
     opt = tk.OptionMenu(root1, var, "show life", "generate x generation")
 
-    lb2.grid(row=1, column=1)
-    ent_way.grid(row=1, column=2)
-    opt.grid(row=2, column=1)
-    bt.grid(row=2, column=2)
+    lb1.grid(row=1, column=1)
+    lbh.grid(row=2, column=1)
+    ent_h.grid(row=2, column=2)
+    lbw.grid(row=3, column=1)
+    ent_w.grid(row=3, column=2)
+    lb2.grid(row=4, column=1)
+    ent_way.grid(row=4, column=2)
+    opt.grid(row=5, column=1)
+    bt.grid(row=5, column=2)
 
     root1.mainloop()
 
@@ -173,8 +185,6 @@ if __name__ == "__main__":
     f = ""
     generation = 1
     change = 0  # 1 if was some changes in figure, else 0
-    HEIGHT = 500
-    WIDTH = 500
 
     get_data()
     while 1:
