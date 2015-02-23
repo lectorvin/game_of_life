@@ -131,9 +131,9 @@ def image_():
     draw = ImageDraw.Draw(im)
     step1 = HEIGHT / (size[0]+1)
     step2 = WIDTH / (size[1]+1)
-    for k in range(size[0]+1):
+    for k in range(size[0]+2):
         draw.line((0, k*step1, WIDTH, k*step1), fill="black")    # ------
-    for k in range(size[1]+1):
+    for k in range(size[1]+2):
         draw.line((k*step2, 0, k*step2, HEIGHT), fill="black")    # |
     for st in range(size[0]+1):
         for c in range(size[1]+1):
@@ -145,16 +145,22 @@ def image_():
 
 
 def show_():
+    global label
     """ update image on root
     """
+    label.destroy()
     photo = ImageTk.PhotoImage(image_())
     label = tk.Label(image=photo)
     label.image = photo
     label.grid(row=1, column=1)
+
+    # ?????? 
     button = tk.Button(root, text="ok", width=5, height=1,
                        font="arial 20", command=root.destroy)
-    button.grid(row=2, column=1)
-    label.after(500, main)
+    # WHY? If i delete this button, program would crash
+    # ???? It isn't make any sense!!!!!!
+
+    label.after(10, main)
 
 
 # LOGIC FUNCTIONS
