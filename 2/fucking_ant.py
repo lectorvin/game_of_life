@@ -21,7 +21,7 @@ class UnexpectedError(Exception):
         self.value = value
 
 
-def data():
+def data():   # First window, get size of image, ant's coordinates
     global f, HEIGHT, WIDTH, size, way, x, y, arrray
     global ent_h, ent_w, ent_y, ent_x, ent_dir, var, root1
 
@@ -40,8 +40,6 @@ def data():
     lb_y = tk.Label(root1, text="y", font="arial 12")
     ent_x = tk.Entry(root1)
     ent_y = tk.Entry(root1)
-    lb_dir = tk.Label(root1, text="Direction of moving:", font="arial 12")
-    ent_dir = tk.Entry(root1)
     bt = tk.Button(root1, text="done", command=ok, font="arial 14")
 
     lb1.grid(row=1, column=1)
@@ -54,23 +52,20 @@ def data():
     lb_y.grid(row=6, column=1)
     ent_x.grid(row=5, column=2)
     ent_y.grid(row=6, column=2)
-    lb_dir.grid(row=7, column=1)
-    ent_dir.grid(row=7, column=2)
-    opt.grid(row=8, column=1)
-    bt.grid(row=8, column=2)
+    opt.grid(row=7, column=1)
+    bt.grid(row=7, column=2)
 
     root1.mainloop()
 
 
-def ok():
+def ok():  # Second window, get size of field or way
     global f, HEIGHT, WIDTH, x, y, direction
     global root2, ent_size0, ent_size1
-    
+
     HEIGHT = int(ent_h.get())
     WIDTH = int(ent_w.get())
     x = int(ent_x.get())
     y = int(ent_y.get())
-    direction = int(ent_dir.get())
     f = var.get()
     root1.destroy()
     if f == "White field":
@@ -125,26 +120,33 @@ def get_value():
     root2.destroy()
 
 
-def image_():
-    print(step, "step")
+def image_():  # generate image with ant's way
+    if (step % 100) == 0:  # maybe, it'll be faster without print
+        print(step, "step")
     im = Image.new("RGBA", (WIDTH+1, HEIGHT+1), (256, 256, 256, 256))
     draw = ImageDraw.Draw(im)
     step1 = HEIGHT / (size[0]+1)
     step2 = WIDTH / (size[1]+1)
+    """  If you want to see cells
     for k in range(size[0]+2):
         draw.line((0, k*step1, WIDTH, k*step1), fill="black")    # ------
     for k in range(size[1]+2):
         draw.line((k*step2, 0, k*step2, HEIGHT), fill="black")    # |
+    """
     for st in range(size[0]+1):
         for c in range(size[1]+1):
-            if array[st][c]:
+            if st == x and c == y:
+                draw.rectangle((c*step2, st*step1, (c+1)*step2, (st+1)*step1),
+                               fill="red",
+                               outline="red")
+            elif array[st][c]:
                 draw.rectangle((c*step2, st*step1, (c+1)*step2, (st+1)*step1),
                                fill="black",
                                outline="black")
     return im
 
 
-def show_():
+def show_():   # update image on root
     global label
     """ update image on root
     """
@@ -154,13 +156,12 @@ def show_():
     label.image = photo
     label.grid(row=1, column=1)
 
-    # ?????? 
+    # ??????
     button = tk.Button(root, text="ok", width=5, height=1,
                        font="arial 20", command=root.destroy)
-    # WHY? If i delete this button, program would crash
-    # ???? It isn't make any sense!!!!!!
+    # WHY? If i delete this button, program will crash
 
-    label.after(10, main)
+    label.after(2, main)
 
 
 # LOGIC FUNCTIONS
@@ -199,7 +200,7 @@ def step_():
 def main():
     global step
 
-    show_()    
+    show_()
     if (array[x][y] == 0) or (array[x][y] == 1):
         turn(int(not(array[x][y])))
         array[x][y] = int(not(array[x][y]))
