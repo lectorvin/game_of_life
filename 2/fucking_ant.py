@@ -1,13 +1,19 @@
 import numpy as np
-import time
-import sys
 import tkinter as tk
 
 from PIL import Image, ImageDraw, ImageTk
-# 0 - white, 1 - black
+
+""" simple cool ants
+1. ["White", "Red", "Lime"] [1, 1, 0]   - 10000 steps before highway
+2. ["White", "Red", "Lime"] [0, 1, 0]   - never
+3. ["White", "Red", "Lime", "Cyan", "Gold", "DeepPink", "Gray",
+"Maroon", "DarkGreen","MidnightBlue"] [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]  - 1000
+4. ["White", "Red", "Lime", "Cyan", "Gold", "DeepPink", "Gray", "Maroon",
+"DarkGreen", "MidnightBlue", "DarkKhaki", "Indigo"]
+[1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0]  - 30000
+"""
 
 
-f = 0
 HEIGHT = 320   # of window
 WIDTH = 320
 size = [0, 0]   # cell, of field
@@ -18,6 +24,7 @@ y0 = 0
 step = 1
 value = 0
 direction = 0     # 0 - North, 1 - East, 2 - South, 3 - West
+
 color = ["White",
          "Red",
          "Lime",
@@ -27,30 +34,19 @@ color = ["White",
          "Gray",
          "Maroon",
          "DarkGreen",
-         "MidnightBlue"]   # 0 - white, 1 - red
+         "MidnightBlue",
+         "DarkKhaki",
+         "Indigo"]
 color_numbers = len(color)
-# 1 - counterclockwise, 0 - clockwise
+turns = [1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0]
 # 1 - left, 0 - right
-turns = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]
-
-""" cool ants
-1. ["White", "Red", "Lime"] [1, 1, 0]
-2. ["White", "Red", "Lime", "Cyan", "Gold", "DeepPink", "Gray",
-Maroon", "DarkGreen","MidnightBlue"] [0, 1, 0, 1, 0, 1, 1, 0, 1, 0]
-"""
-
-
-class UnexpectedError(Exception):
-    def __init__(self, value):
-        self.value = value
 
 
 def data():   # First window, get size of image, ant's coordinates
-    global f, HEIGHT, WIDTH, size, way, x, y, arrray
     global ent_size0, ent_size1, ent_y, ent_x, root1
 
     root1 = tk.Tk()
-    root1.geometry('+500+400')
+    root1.geometry('+300+300')
     lb1 = tk.Label(root1, text="Size of field in cells:", font="arial 12")
     lb_size0 = tk.Label(root1, text="height", font="arial 12")
     lb_size1 = tk.Label(root1, text="width", font="arial 12")
@@ -78,41 +74,40 @@ def data():   # First window, get size of image, ant's coordinates
     root1.mainloop()
 
 
-def ok():  # Second window, get size of field or way
+def ok():
+    """ get original coordinates, size, create array
+    """
     global x, y, size, array
 
     x = int(ent_x.get())
     y = int(ent_y.get())
     size = (int(ent_size0.get())-1, int(ent_size1.get())-1)
     array = np.zeros((size[0]+1, size[1]+1), dtype=int)
-    
+
     root1.destroy()
 
 
-def image_():  # generate image with ant's way
-    global im, color
-    
+def image_():
+    """ update image with ant's way
+    each step only 2 cells change color (with ant and previous cell)
+    """
     if (step % 500) == 0:  # maybe, it'll be faster without print
         print(step, "step")
-        
-    draw = ImageDraw.Draw(im)
+
     step1 = HEIGHT / (size[0]+1)
     step2 = WIDTH / (size[1]+1)
-    value = array[x0][y0]
 
     if step != 1:
         draw.rectangle((x0*step2, y0*step1, (x0+1)*step2, (y0+1)*step1),
-                        fill=color[value])
+                       fill=color[array[x0][y0]])
     draw.rectangle((x*step2, y*step1, (x+1)*step2, (y+1)*step1),
-                    fill="black",
-                    outline="black")
+                   fill="black",
+                   outline="black")
 
 
 def show_():   # update image on root
     """ update image on root
     """
-    global label
-
     image_()
     photo = ImageTk.PhotoImage(im)
     label['image'] = photo
@@ -120,33 +115,38 @@ def show_():   # update image on root
 
 
 # LOGIC FUNCTIONS
-def turn(move):   # by turns[] rules
+def turn(move):   # by turns[] rules, move - 1(left), 0(right)
     global direction
 
-    if move == 1:   # clockwise
+    if move == 1:   # counterclockwise, left
         direction = (direction - 1) % 4
-    elif move == 0:  # counterclockwise
+    elif move == 0:  # clockwise, right
         direction = (direction + 1) % 4
 
 
 def step_():
-    global direction, x, y, size
-    if direction == 0:   # North
+    global x, y
+    """ the ant move forward in direction
+    the left and right edges of the field are stitched together,
+    and the top and bottom edges also
+    """
+
+    if direction == 0:     # North
         if y != 0:
             y -= 1
         else:
             y = size[0]
-    elif direction == 1:   # East  ->
+    elif direction == 1:   # East  -->
         if x != size[1]:
             x += 1
         else:
             x = 0
-    elif direction == 2:    # South
+    elif direction == 2:   # South
         if y != size[0]:
             y += 1
         else:
             y = 0
-    elif direction == 3:    # West   <--
+    elif direction == 3:   # West   <--
         if x != 0:
             x -= 1
         else:
@@ -154,36 +154,33 @@ def step_():
 
 
 def main():
-    global step, x0, y0, turns, color_numbers, color, value
-    
-    show_()
+    global step, x0, y0
 
-    x0 = x
+    show_()   # update image one root
+
+    x0 = x    # save previous ant's cell to update on next step
     y0 = y
-    value = array[x][y]
-    if isinstance(array[x][y],np.int32) and (-1 < array[x][y] < color_numbers):
-        turn(turns[value])
-        array[x][y] = (value+1) % color_numbers
-    else:
-        print(array[x][y], type(array[x][y]))
-        raise(UnexpectedError("Something goes wrong!"))
-        sys.exit()
-    step_()
-    step += 1
+    value = array[x][y]     # get color like 0, 1...
+    turn(turns[value])      # ant turns left/right
+    array[x][y] = (value+1) % color_numbers     # cell change color to next
+    step_()                 # ant move forward one unit
+    step += 1               # so, we lived one more step
 
-    label.after(2, main)
+    label.after(1, main)    # after 1 milliseconds this function repeat
 
 
 if __name__ == "__main__":
     data()
-    
+
     root = tk.Tk()
+    root.geometry('+300+200')
     im = Image.new("RGBA", (WIDTH+1, HEIGHT+1), "LightGray")
     photo = ImageTk.PhotoImage(im)
+    draw = ImageDraw.Draw(im)
     label = tk.Label()
     label['image'] = photo
     label.image = photo
     label.pack()
-    
+
     label.after_idle(main)
     root.mainloop()
